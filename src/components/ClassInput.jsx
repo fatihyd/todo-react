@@ -1,5 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
+import Count from './Count';
 
 class ClassInput extends Component {
     constructor(props) {
@@ -8,6 +9,7 @@ class ClassInput extends Component {
         this.state = {
             todos: ['Just some demo tasks', 'As an example'],
             inputVal: '',
+            count: 2 // not ideal !!!
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -27,6 +29,7 @@ class ClassInput extends Component {
         this.setState((state) => ({
             todos: state.todos.concat(state.inputVal),
             inputVal: '',
+            count: state.count + 1
         }));
     }
 
@@ -35,7 +38,8 @@ class ClassInput extends Component {
         this.setState((prevState) => {
             return {
                 ...prevState,
-                todos: newTodos
+                todos: newTodos,
+                count: prevState.count - 1
             }
         });
     }
@@ -45,6 +49,7 @@ class ClassInput extends Component {
             <section>
                 {/* eslint-disable-next-line react/prop-types */}
                 <h3>{this.props.name}</h3>
+                <Count count={this.state.count} />
                 {/* The input field to enter To-Do's */}
                 <form onSubmit={this.handleSubmit}>
                     {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}

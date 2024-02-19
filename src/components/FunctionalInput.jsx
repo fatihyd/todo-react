@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Count from './Count';
 
 // eslint-disable-next-line react/function-component-definition, react/prop-types
 const FunctionalInput = ({ name }) => {
@@ -9,6 +10,7 @@ const FunctionalInput = ({ name }) => {
     */
     const [todos, setTodos] = useState(['Just some demo tasks', 'As an example']);
     const [inputVal, setInputVal] = useState('');
+    const [count, setCount] = useState(todos.length);
 
     const handleInputChange = (e) => {
         setInputVal(e.target.value);
@@ -18,16 +20,19 @@ const FunctionalInput = ({ name }) => {
         e.preventDefault();
         setTodos((todo) => [...todo, inputVal]);
         setInputVal('');
+        setCount(prevCount => prevCount + 1);
     };
 
     const handleDelete = (todoToDelete) => {
         const newTodos = todos.filter(todo => todo !== todoToDelete);
         setTodos(newTodos);
+        setCount(prevCount => prevCount - 1);
     }
 
     return (
         <section>
             <h3>{name}</h3>
+            <Count count={count} />
             {/* The input field to enter To-Do's */}
             <form onSubmit={handleSubmit}>
                 {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
