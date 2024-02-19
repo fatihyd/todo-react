@@ -9,6 +9,7 @@ class ClassInput extends Component {
         this.state = {
             todos: ['Just some demo tasks', 'As an example'],
             inputVal: '',
+            editIndex: null
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -23,13 +24,29 @@ class ClassInput extends Component {
         }));
     }
 
-    handleSubmit(e) {
+    handleSubmit = (e) => {
         e.preventDefault();
-        this.setState((state) => ({
-            todos: state.todos.concat(state.inputVal),
-            inputVal: '',
-        }));
-    }
+        if (this.state.editIndex !== null) {
+            const updatedTodos = [...this.state.todos];
+            updatedTodos[this.state.editIndex] = this.state.inputVal;
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    todos: updatedTodos,
+                    editIndex: null,
+                    inputVal: ''
+                }
+            });
+        } else {
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    todos: [...prevState.todos, this.state.inputVal],
+                    inputVal: ''
+                }
+            });
+        }
+    };
 
     handleDelete(todoToDelete) {
         const newTodos = this.state.todos.filter(todo => todo !== todoToDelete);
@@ -41,13 +58,22 @@ class ClassInput extends Component {
         });
     }
 
+    handleEdit = (index, todo) => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                editIndex: index,
+                inputVal: todo
+            }
+        });
+    }
+
     render() {
         const count = this.state.todos.length;
 
         return (
             <section>
-                {/* eslint-disable-next-line react/prop-types */}
-                <h3>{this.props.name}</h3>
+                <h3>{name}</h3>
                 <Count count={count} />
                 {/* The input field to enter To-Do's */}
                 <form onSubmit={this.handleSubmit}>
@@ -64,10 +90,27 @@ class ClassInput extends Component {
                 <h4>All the tasks!</h4>
                 {/* The list of all the To-Do's, displayed */}
                 <ul>
-                    {this.state.todos.map((todo) => (
+                    {this.state.todos.map((todo, index) => (
                         <li key={todo}>
-                            {todo}
+                            {
+                                this.state.editIndex !== index ?
+                                    todo : (
+                                        <input
+                                            type="text"
+                                            name="task-entry"
+                                            value={this.state.inputVal}
+                                            onChange={this.handleInputChange}
+                                        />
+                                    )
+                            }
                             <button onClick={() => this.handleDelete(todo)}>Delete!</button>
+                            {
+                                this.state.editIndex === index ? (
+                                    <button onClick={this.handleSubmit}>Resubmit</button>
+                                ) : (
+                                    <button onClick={() => this.handleEdit(index, todo)}>Edit</button>
+                                )
+                            }
                         </li>
                     ))}
                 </ul>
