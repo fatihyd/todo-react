@@ -20,6 +20,11 @@ const FunctionalInput = ({ name }) => {
         setInputVal('');
     };
 
+    const handleDelete = (todoToDelete) => {
+        const newTodos = todos.filter(todo => todo !== todoToDelete);
+        setTodos(newTodos);
+    }
+
     return (
         <section>
             <h3>{name}</h3>
@@ -39,7 +44,10 @@ const FunctionalInput = ({ name }) => {
             {/* The list of all the To-Do's, displayed */}
             <ul>
                 {todos.map((todo) => (
-                    <li key={todo}>{todo}</li>
+                    <li key={todo}>
+                        {todo}
+                        <button onClick={() => handleDelete(todo)}>Delete!</button>
+                    </li>
                 ))}
             </ul>
         </section>
