@@ -9,43 +9,38 @@ class ClassInput extends Component {
         this.state = {
             todos: ['Just some demo tasks', 'As an example'],
             inputVal: '',
-            editIndex: null
+            editingTodo: null,
+            editVal: ''
         };
 
-        this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleResubmit = this.handleResubmit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
-    }
-
-    handleInputChange(e) {
-        this.setState((state) => ({
-            ...state,
-            inputVal: e.target.value,
-        }));
+        this.handleEdit = this.handleEdit.bind(this);
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
-        if (this.state.editIndex !== null) {
-            const updatedTodos = [...this.state.todos];
-            updatedTodos[this.state.editIndex] = this.state.inputVal;
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    todos: updatedTodos,
-                    editIndex: null,
-                    inputVal: ''
-                }
-            });
-        } else {
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    todos: [...prevState.todos, this.state.inputVal],
-                    inputVal: ''
-                }
-            });
-        }
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                todos: [...prevState.todos, this.state.inputVal],
+                inputVal: ''
+            }
+        });
+    };
+
+    handleResubmit = (todo) => {
+        const updatedTodos = [...this.state.todos];
+        updatedTodos[this.state.todos.indexOf(todo)] = this.state.editVal;
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                todos: updatedTodos,
+                editingTodo: null,
+                editVal: ''
+            }
+        });
     };
 
     handleDelete(todoToDelete) {
@@ -58,12 +53,12 @@ class ClassInput extends Component {
         });
     }
 
-    handleEdit = (index, todo) => {
+    handleEdit = (todo) => {
         this.setState((prevState) => {
             return {
                 ...prevState,
-                editIndex: index,
-                inputVal: todo
+                editingTodo: todo,
+                editVal: todo
             }
         });
     }
@@ -73,42 +68,52 @@ class ClassInput extends Component {
 
         return (
             <section>
-                <h3>{name}</h3>
+                <h3>{this.props.name}</h3>
                 <Count count={count} />
                 {/* The input field to enter To-Do's */}
                 <form onSubmit={this.handleSubmit}>
-                    {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                     <label htmlFor="task-entry">Enter a task: </label>
                     <input
                         type="text"
                         name="task-entry"
                         value={this.state.inputVal}
-                        onChange={this.handleInputChange}
+                        onChange={
+                            (e) => this.setState((prevState) => ({
+                                ...prevState,
+                                inputVal: e.target.value
+                            }))
+                        }
                     />
                     <button type="submit">Submit</button>
                 </form>
                 <h4>All the tasks!</h4>
                 {/* The list of all the To-Do's, displayed */}
                 <ul>
-                    {this.state.todos.map((todo, index) => (
+                    {this.state.todos.map((todo) => (
                         <li key={todo}>
                             {
-                                this.state.editIndex !== index ?
+                                this.state.editingTodo !== todo ?
                                     todo : (
                                         <input
                                             type="text"
-                                            name="task-entry"
-                                            value={this.state.inputVal}
-                                            onChange={this.handleInputChange}
+                                            name="task-edit"
+                                            value={this.state.editVal}
+                                            onChange={
+                                                (e) => this.setState((prevState) => ({
+                                                    ...prevState,
+                                                    editVal: e.target.value
+                                                }))
+                                            }
                                         />
                                     )
                             }
                             <button onClick={() => this.handleDelete(todo)}>Delete!</button>
                             {
-                                this.state.editIndex === index ? (
-                                    <button onClick={this.handleSubmit}>Resubmit</button>
+                                this.state.editingTodo === todo ? (
+                                    <button
+                                        onClick={() => { this.handleResubmit(todo) }}>Resubmit</button>
                                 ) : (
-                                    <button onClick={() => this.handleEdit(index, todo)}>Edit</button>
+                                    <button onClick={() => this.handleEdit(todo)}>Edit</button>
                                 )
                             }
                         </li>

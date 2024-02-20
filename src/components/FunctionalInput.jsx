@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Count from './Count';
 
-// eslint-disable-next-line react/function-component-definition, react/prop-types
 const FunctionalInput = ({ name }) => {
     /*
       We declare two state variables and their setters,
@@ -10,24 +9,22 @@ const FunctionalInput = ({ name }) => {
     */
     const [todos, setTodos] = useState(['Just some demo tasks', 'As an example']);
     const [inputVal, setInputVal] = useState('');
-    const [editIndex, setEditIndex] = useState(null);
+    const [editingTodo, setEditingTodo] = useState(null);
+    const [editVal, setEditVal] = useState('');
     const count = todos.length;
-
-    const handleInputChange = (e) => {
-        setInputVal(e.target.value);
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (editIndex !== null) {
-            const updatedTodos = [...todos];
-            updatedTodos[editIndex] = inputVal;
-            setTodos(updatedTodos);
-            setEditIndex(null);
-        } else {
-            setTodos((todo) => [...todo, inputVal]);
-        }
+        setTodos((todo) => [...todo, inputVal]);
         setInputVal('');
+    };
+
+    const handleResubmit = (todo) => {
+        const updatedTodos = [...todos];
+        updatedTodos[todos.indexOf(todo)] = editVal;
+        setTodos(updatedTodos);
+        setEditingTodo(null);
+        setEditVal('');
     };
 
     const handleDelete = (todoToDelete) => {
@@ -35,9 +32,9 @@ const FunctionalInput = ({ name }) => {
         setTodos(newTodos);
     }
 
-    const handleEdit = (index, todo) => {
-        setEditIndex(index);
-        setInputVal(todo);
+    const handleEdit = (todo) => {
+        setEditingTodo(todo);
+        setEditVal(todo);
     }
 
     return (
@@ -46,38 +43,38 @@ const FunctionalInput = ({ name }) => {
             <Count count={count} />
             {/* The input field to enter To-Do's */}
             <form onSubmit={handleSubmit}>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label htmlFor="task-entry">Enter a task: </label>
                 <input
                     type="text"
                     name="task-entry"
                     value={inputVal}
-                    onChange={handleInputChange}
+                    onChange={(e) => setInputVal(e.target.value)}
                 />
                 <button type="submit">Submit</button>
             </form>
             <h4>All the tasks!</h4>
             {/* The list of all the To-Do's, displayed */}
             <ul>
-                {todos.map((todo, index) => (
+                {todos.map((todo) => (
                     <li key={todo}>
                         {
-                            editIndex !== index ?
+                            editingTodo !== todo ?
                                 todo : (
                                     <input
                                         type="text"
-                                        name="task-entry"
-                                        value={inputVal}
-                                        onChange={handleInputChange}
+                                        name="task-edit"
+                                        value={editVal}
+                                        onChange={(e) => setEditVal(e.target.value)}
                                     />
                                 )
                         }
                         <button onClick={() => handleDelete(todo)}>Delete!</button>
                         {
-                            editIndex === index ? (
-                                <button onClick={handleSubmit}>Resubmit</button>
+                            editingTodo === todo ? (
+                                <button
+                                    onClick={() => { handleResubmit(todo) }}>Resubmit</button>
                             ) : (
-                                <button onClick={() => handleEdit(index, todo)}>Edit</button>
+                                <button onClick={() => handleEdit(todo)}>Edit</button>
                             )
                         }
                     </li>
